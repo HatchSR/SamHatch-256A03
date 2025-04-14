@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %} 256 A03 {% endblock title %}</title>
+    <script src="https://cdn.tailwindcss.com"> </script>
+    <script src="https://kit.fontawesome.com/d2e78ba9e6.js" crossorigin="anonymous"></script>
+</head>
+<body class="bg-ivory text-dark-grey">
+    <div class="p-4">
+        {% block welcome %}
+            <h1 class="text-3xl"> ITAS 256 Assignment 03. </h1>
+        {% endblock welcome %}
+        <nav class="hidden md:flex space space-x-4 menu">
+            <a href="{% url 'home' %}" class="hover:underline"> Home <i class="fa-solid fa-house"></i></a>
+            {% if user.is_authenticated%}
+            <a href="{% url 'logoutaccount' %}" class="hover:underline"> logout <i class="fa-solid"></i></a>
+            {% else %}
+            <a href="{% url 'loginaccount' %}" class="hover:underline"> Login <i class="fa-solid fa-user"></i></a>
+            <a href="{% url 'signupaccount' %}" class="hover:underline"> Sign up <i class="fa-solid fa-user-plus"></i></a>
+            {% endif %}
+
+
+            
+        </nav>    
+    </div>
+    <div id="content">
+        {% block content %} {% endblock %}
+    </div>
+</body>
+</html>

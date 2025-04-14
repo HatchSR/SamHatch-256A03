@@ -12,7 +12,7 @@ class AuthenticateForm(AuthenticationForm):
 class UserCreateForm(UserCreationForm):
     name = forms.CharField(label = 'Name')
     email = forms.EmailField(label = 'email')
-    user_type = forms.ChoiceField(label = 'user type', choices=[('Reader','Reader'), ('Publisher','Publisher')], widget=forms.RadioSelect)
+    user_type = forms.ChoiceField(label = 'user type', choices=[('Registrant','Registrant'), ('Admin','Admin')], widget=forms.RadioSelect)
     def __init__(self, request = ..., *args, **kwargs, ):
         super(UserCreateForm, self).__init__(*args, **kwargs)
         for fieldname in ['name','username','password1', 'password2','email']:

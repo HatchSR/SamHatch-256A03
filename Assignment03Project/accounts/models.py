@@ -10,7 +10,7 @@ class Person(models.Model):
 
 class Group(models.Model):
     name = models.CharField(max_length=100)
-    members = models.ManyToManyField(Person, through='user_group')
+
 
     def __str__(self):
         return self.name

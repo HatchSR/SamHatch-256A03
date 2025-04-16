@@ -1,74 +1,92 @@
-from django.shortcuts import render
-from .models import Person
-from django.contrib.auth import login,logout,authenticate
-from django.shortcuts import redirect
+from django.shortcuts import render, redirect
+from .models import Person, Group
+from django.contrib.auth import login, logout, authenticate
 from django.db import IntegrityError
 from .forms import AuthenticateForm, UserCreateForm
-from django.contrib import auth
-from django.contrib.sessions.backends.db import SessionStore
-
-
+from django.contrib.auth.models import User
+from django.http import HttpResponse
 
 
 def home(request):
-    return render(request, 'home.html')
-    #return render(request,'home.html')
-
+    return HttpResponse('<h1>Home</h1>')
 def signupaccount(request):
     if request.method == 'GET':
-        return render(request, 'signupaccount.html',{'form': UserCreateForm()})
+        return render(request, 'signupaccount.html', {'form': UserCreateForm()})
     else:
         if request.POST['password1'] == request.POST['password2']:
             try:
-                print(request.POST.get('user_type'))
-                user = Person.objects.create_user(request.POST['username'],name=request.POST['name'], email=request.POST['email'],user_type=request.POST.get('user_type'), password=request.POST['password1'])
+                # Create Django User
+                user = User.objects.create_user(
+                    username=request.POST['username'],
+                    email=request.POST['email'],
+                    password=request.POST['password1']
+                )
                 user.save()
-                username = request.POST['username']
-                print(f'USERNAME:{username}')
-                
+
+                # Find the Group object (your custom Group model)
+                group_name = request.POST.get('user_type')  # From the form input
+                try:
+                    group = Group.objects.get(name=group_name)
+                except Group.DoesNotExist:
+                    group = None  # Optional: handle this more gracefully
+
+                # Create the Person object
+                Person.objects.create(
+                    user=user,
+                    user_group=group
+                )
 
                 login(request, user)
-                request.session[username]
-                print(f'SESSION NAME: {request.session.get('username')}')
-                peron_info = Person.objects.all().filter(username = username)
-                person_role = peron_info.values('user_type')
-                request.session['role'] = person_role
+
+                request.session['username'] = user.username
+                request.session['role'] = group.name if group else 'No group'
                 request.session.modified = True
 
-                
                 return redirect('home')
+
             except IntegrityError:
-                return render(request, 'signupaccount.html', {'form': UserCreateForm(), 'error': 'User already exists'})
+                return render(request, 'signupaccount.html', {
+                    'form': UserCreateForm(),
+                    'error': 'User already exists'
+                })
         else:
-            return render(request, 'signupaccount.html', {'form': UserCreateForm(), 'error': 'Passwords do not match'})
+            return render(request, 'signupaccount.html', {
+                'form': UserCreateForm(),
+                'error': 'Passwords do not match'
+            })
+
 
 
 def logoutaccount(request):
     logout(request)
     return redirect('home')
 
+
 def loginaccount(request):
     if request.method == 'GET':
-        return render(request, 'loginaccount.html',{'form': AuthenticateForm()})
+        return render(request, 'loginaccount.html', {'form': AuthenticateForm()})
     else:
-        user = authenticate(request, username=request.POST['username'], password=request.POST['password'])
-        username = request.POST['username']
-        print(f'USERNAME:{username}')
-            
-        request.session['username'] = username
-        peron_info = Person.objects.all().filter(username = username)
-        person_role = peron_info.values('user_type')
-        # print(person_role)
-        request.session['role'] = person_role[0]['user_type']
-        
-    
-        
-        # request.session['role'] = Person.user_type
-        print(f'SESSION NAME: {request.session.get('username')}{request.session.get('role')}')
-        request.session.modified = True
+        user = authenticate(
+            request,
+            username=request.POST['username'],
+            password=request.POST['password']
+        )
+
         if user is None:
-            return render(request, 'loginaccount.html', {'form': AuthenticateForm(), 'error': 'Invalid username or password'})
+            return render(request, 'loginaccount.html', {
+                'form': AuthenticateForm(),
+                'error': 'Invalid username or password'
+            })
         else:
             login(request, user)
+
+            try:
+                person = Person.objects.get(user=user)
+                request.session['username'] = user.username
+                request.session['role'] = person.user_group.name if person.user_group else 'No group'
+                request.session.modified = True
+            except Person.DoesNotExist:
+                request.session['username'] = user.username
+                request.session['role'] = 'No person profile'
 
             return redirect('home')

@@ -8,11 +8,39 @@
         {{form.as_p}}
         <br>
         <p class = 'mb-4'>
-            <button type = 'submit' class = 'bg-blue-500 hover:bg-blue-800 text-white font-bold py-2 px-4 rounded'>Create Event</button>
+            <button type = 'submit' class = 'bg-blue-500 hover:bg-blue-800 text-white font-bold py-2 px-4 rounded'> <i class="fa-solid fa-plus"></i> Create Event</button>
         </p>
     </form>
 </p>
 </div>
 
+{% for event in events %}
+<div class="mb-6 p-4 border rounded bg-gray-100">
+    <form method="POST">
+        {% csrf_token %}
+        <input type="hidden" name="event_id" value="{{ event.id }}">
+
+        <label>Name:</label>
+        <input type="text" name="title" value="{{ event.name }}" class="block w-full p-2 mb-2 border rounded">
+
+        <label>Description:</label>
+        <textarea name="description" class="block w-full p-2 mb-2 border rounded">{{ event.description }}</textarea>
+
+        <label>Start Date:</label>
+        <input type="date" name="start_date" value="{{ event.start_date|date:'Y-m-d' }}" class="block w-full p-2 mb-2 border rounded">
+
+        <label>End Date:</label>
+        <input type="date" name="end_date" value="{{ event.end_date|date:'Y-m-d' }}" class="block w-full p-2 mb-2 border rounded">
+
+        <button name="edit_event" value="true" type="submit" class="bg-green-500 hover:bg-green-800 text-white font-bold py-2 px-4 rounded mr-2">
+            <i class="fa-solid fa-pencil"></i> Save Changes
+        </button>
+
+        <button name="delete_event" value="true" type="submit" class="bg-red-500 hover:bg-red-800 text-white font-bold py-2 px-4 rounded">
+            <i class="fa-solid fa-trash"></i> Delete Event
+        </button>
+    </form>
+</div>
+{% endfor %}
 
 {%endblock content%}

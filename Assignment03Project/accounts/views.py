@@ -24,9 +24,15 @@ def signupaccount(request):
                 user.save()
 
                 # Find the Group object (your custom Group model)
+                print(f"Submitted user_type: {request.POST.get('user_type')}")
                 group_name = request.POST.get('user_type')  # From the form input
                 try:
-                    group = Group.objects.get(name=group_name)
+                    group, created = Group.objects.get_or_create(name=group_name)
+                    if created:
+                        print(f"Created new group: {group_name}")
+                    else:
+                        print(f"Found existing group: {group_name}")
+                    
                 except Group.DoesNotExist:
                     group = None  # Optional: handle this more gracefully
 

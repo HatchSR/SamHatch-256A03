@@ -8,3 +8,8 @@ class Event(models.Model):
     start_date = models.DateField()
     end_date = models.DateField()
     
+    registered_users = models.ManyToManyField('accounts.Person', related_name='registered_events', blank=True)
+    
+    def __str__(self):
+        return self.name
+    

@@ -4,15 +4,20 @@ from django.contrib.auth.models import User
 from .models import Event
 from .forms import EventForm
 from accounts.models import Person
+import datetime
 
 
-# Create your views here.
+
 def events(request):
     if request.method == "GET":
-        # Check if the user is authenticated
+        
         if request.user.is_authenticated:
+            currentEvents = []
+            for event in Event.objects.all():
+                if  datetime.date.today() <= event.end_date:
+                    currentEvents.append(event)
             person = Person.objects.get(user=request.user)
-            return render(request, 'events.html', {'events': Event.objects.all(),'person': person})
+            return render(request, 'events.html', {'events': currentEvents,'person': person})
         else:
             print('user is not authenticated')
             return redirect('loginaccount')
@@ -33,7 +38,7 @@ def events(request):
                 
 def adminEvents(request):
     if request.method == "GET":
-        # Check if the user is authenticated
+        
         if request.user.is_authenticated:
             if request.session.get('role') == 'Admin':
                 return render(request, 'adminEvents.html', {'form': EventForm(), 'events': Event.objects.all()})
@@ -73,7 +78,7 @@ def adminEvents(request):
 
                     return redirect('events')
 
-                # DELETE EVENT
+                
         elif 'delete_event' in request.POST:
                     event_id = request.POST.get('event_id')
                     if event_id:
@@ -87,5 +92,5 @@ def adminEvents(request):
             
             return redirect('reports', event_id=event_id)
 
-            # Fallback redirect
+            
         return redirect('events')

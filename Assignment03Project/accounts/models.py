@@ -6,7 +6,7 @@ class Person(models.Model):
     user_group = models.ForeignKey('Group', on_delete=models.SET_NULL, null=True)
 
     def __str__(self):
-        return f"{self.user.username} ({self.user_group})"
+        return f"USERNAME: {self.user.username}, ROLE:{self.user_group}<br> "
 
 class Group(models.Model):
     name = models.CharField(max_length=100)

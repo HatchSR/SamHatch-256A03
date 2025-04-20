@@ -11,5 +11,5 @@ class Event(models.Model):
     registered_users = models.ManyToManyField('accounts.Person', related_name='registered_events', blank=True)
     
     def __str__(self):
-        return f'{self.name} ({self.start_date} - {self.end_date})<br>'
+        return f'{self.name} ({self.start_date} - {self.end_date})'
     

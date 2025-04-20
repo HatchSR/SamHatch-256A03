@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="space-y-6">
+    <!-- Page Header -->
+    <div class="flex items-center justify-between mb-6">
+        <h1 class="text-2xl font-semibold text-gray-800">User Reports</h1>
+    </div>
+
+    <!-- Users List -->
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+        <div class="px-6 py-4 border-b border-gray-200 bg-gray-50">
+            <h2 class="font-medium text-gray-700">System Users</h2>
+        </div>
+        
+        {% if person %}
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Username</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Role</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                        {% for username, group in person.items %}
+                            <tr>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="flex items-center">
+                                        <div class="h-8 w-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center mr-3">
+                                            <i class="fa-solid fa-user text-sm"></i>
+                                        </div>
+                                        <div class="text-sm font-medium text-gray-900">{{ username }}</div>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
+                                        {% if group == 'Admin' %}
+                                            bg-purple-100 text-purple-800
+                                        {% elif group == 'Staff' %}
+                                            bg-blue-100 text-blue-800
+                                        {% else %}
+                                            bg-green-100 text-green-800
+                                        {% endif %}
+                                    ">
+                                        {{ group }}
+                                    </span>
+                                </td>
+
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div class="text-center p-8">
+                <div class="text-gray-400 mb-4">
+                    <i class="fa-solid fa-users-slash text-5xl"></i>
+                </div>
+                <h2 class="text-xl font-medium text-gray-700">No Users Found</h2>
+                <p class="text-gray-500 mt-2">There are no users in the system.</p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock content %}

@@ -1,14 +1,70 @@
 {% extends "base.html" %}
-{%block content%}
-<h2>hi this is the reports page</h2>
-<h2>
+{% block content %}
+<div class="space-y-6">
+    <!-- Page Header -->
+    <div class="flex items-center justify-between mb-6">
+        <h1 class="text-2xl font-semibold text-gray-800">Event Report</h1>
+    </div>
 
-{{eventInfo.name}}
-{{eventInfo.start_date}}
-{{eventInfo.end_date}}
-{{eventInfo.description}}
-{{eventInfo.registered_users}}
-</h2>
-{%endblock content%}
-
-
+    <!-- Report Card -->
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+        <div class="bg-gray-50 px-6 py-4 border-b border-gray-200">
+            <h2 class="text-xl font-medium text-gray-800">{{ eventInfo.name }}</h2>
+        </div>
+        
+        <div class="p-6">
+            <!-- Event Details Section -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                <div class="space-y-4">
+                    <div>
+                        <h3 class="text-sm font-medium text-gray-500 mb-1">Date Range</h3>
+                        <p class="text-gray-800 flex items-center">
+                            <i class="fa-regular fa-calendar mr-2 text-gray-400"></i>
+                            {{ eventInfo.start_date }} - {{ eventInfo.end_date }}
+                        </p>
+                    </div>
+                    
+                    <div>
+                        <h3 class="text-sm font-medium text-gray-500 mb-1">Total Registrations</h3>
+                        <p class="text-gray-800 flex items-center">
+                            <i class="fa-solid fa-users mr-2 text-gray-400"></i>
+                            {{ eventInfo.registered_users|length }}
+                        </p>
+                    </div>
+                </div>
+                
+                <div>
+                    <h3 class="text-sm font-medium text-gray-500 mb-1">Description</h3>
+                    <p class="text-gray-800">{{ eventInfo.description }}</p>
+                </div>
+            </div>
+            
+            <!-- Registered Users Section -->
+            <div class="mt-8">
+                <h3 class="text-lg font-medium text-gray-800 mb-4">Registered Users</h3>
+                
+                {% if eventInfo.registered_users %}
+                    <div class="bg-gray-50 rounded-md border border-gray-200">
+                        <ul class="divide-y divide-gray-200">
+                            {% for user in eventInfo.registered_users %}
+                                <li class="px-4 py-3 flex items-center">
+                                    <div class="h-8 w-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center mr-3">
+                                        <i class="fa-solid fa-user text-sm"></i>
+                                    </div>
+                                    <div>
+                                        <p class="text-gray-800">{{user}}</p>
+                                    </div>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                {% else %}
+                    <div class="text-center p-6 bg-gray-50 rounded-md border border-gray-200">
+                        <p class="text-gray-500">No users have registered for this event yet.</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %}

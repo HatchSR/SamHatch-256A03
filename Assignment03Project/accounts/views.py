@@ -5,6 +5,27 @@ from django.db import IntegrityError
 from .forms import AuthenticateForm, UserCreateForm
 from django.contrib.auth.models import User
 from django.http import HttpResponse
+import re
+
+
+
+def password_validation(password):
+    regex = ("^(?=.*[a-z])(?=." +
+             "*[A-Z])(?=.*\\d)" +
+             "(?=.*[-+_!@#$%^&*., ?]).+$")
+     
+    p = re.compile(regex)
+ 
+    # If the string is empty 
+    # return false
+    if (password == None):
+        return
+ 
+    if(re.search(p, password)):
+        return True
+    else:
+        return False
+ 
 
 
 def home(request):
@@ -14,46 +35,53 @@ def signupaccount(request):
         return render(request, 'signupaccount.html', {'form': UserCreateForm()})
     else:
         if request.POST['password1'] == request.POST['password2']:
-            try:
-                # Create Django User
-                user = User.objects.create_user(
-                    username=request.POST['username'],
-                    email=request.POST['email'],
-                    password=request.POST['password1']
-                )
-                user.save()
+            if len(request.POST['password1']) > 6 and password_validation(request.POST['password1']):
+                
+                    try:
+                        # Create Django User
+                        user = User.objects.create_user(
+                            username=request.POST['username'],
+                            email=request.POST['email'],
+                            password=request.POST['password1']
+                        )
+                        user.save()
 
-                # Find the Group object (your custom Group model)
-                print(f"Submitted user_type: {request.POST.get('user_type')}")
-                group_name = request.POST.get('user_type')  # From the form input
-                try:
-                    group, created = Group.objects.get_or_create(name=group_name)
-                    if created:
-                        print(f"Created new group: {group_name}")
-                    else:
-                        print(f"Found existing group: {group_name}")
-                    
-                except Group.DoesNotExist:
-                    group = None  # Optional: handle this more gracefully
+                        # Find the Group object (your custom Group model)
+                        print(f"Submitted user_type: {request.POST.get('user_type')}")
+                        group_name = request.POST.get('user_type')  # From the form input
+                        try:
+                            group, created = Group.objects.get_or_create(name=group_name)
+                            if created:
+                                print(f"Created new group: {group_name}")
+                            else:
+                                print(f"Found existing group: {group_name}")
+                            
+                        except Group.DoesNotExist:
+                            group = None  # Optional: handle this more gracefully
 
-                # Create the Person object
-                Person.objects.create(
-                    user=user,
-                    user_group=group
-                )
+                        # Create the Person object
+                        Person.objects.create(
+                            user=user,
+                            user_group=group
+                        )
 
-                login(request, user)
+                        login(request, user)
 
-                request.session['username'] = user.username
-                request.session['role'] = group.name if group else 'No group'
-                request.session.modified = True
+                        request.session['username'] = user.username
+                        request.session['role'] = group.name if group else 'No group'
+                        request.session.modified = True
 
-                return redirect('home')
+                        return redirect('events')
 
-            except IntegrityError:
+                    except IntegrityError:
+                        return render(request, 'signupaccount.html', {
+                            'form': UserCreateForm(),
+                            'error': 'User already exists'
+                        })
+            else:
                 return render(request, 'signupaccount.html', {
                     'form': UserCreateForm(),
-                    'error': 'User already exists'
+                    'error': 'Password must be at least 6 characters, contain a uppercase, lowercase, special character and a number'
                 })
         else:
             return render(request, 'signupaccount.html', {
@@ -65,7 +93,7 @@ def signupaccount(request):
 
 def logoutaccount(request):
     logout(request)
-    return redirect('home')
+    return redirect('loginaccount')
 
 
 def loginaccount(request):
@@ -95,4 +123,4 @@ def loginaccount(request):
                 request.session['username'] = user.username
                 request.session['role'] = 'No person profile'
 
-            return redirect('home')
+            return redirect('events')

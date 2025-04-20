@@ -1,50 +1,81 @@
 {% extends "base.html" %}
-{%block content%}
-<h2>hi this is the Admin events page</h2>
+{% block content %}
+<div class="space-y-6">
+    <!-- Header Section -->
+    <div class="flex items-center justify-between mb-6">
+        <h2 class="text-2xl font-semibold text-gray-800">Admin Event Management</h2>
+    </div>
 
-<p class = 'mb-4'>
-    <form method = "POST">
-        {% csrf_token %}
-        {{form.as_p}}
-        <br>
-        <p class = 'mb-4'>
-            <button type = 'submit' class = 'bg-blue-500 hover:bg-blue-800 text-white font-bold py-2 px-4 rounded'> <i class="fa-solid fa-plus"></i> Create Event</button>
-        </p>
-    </form>
-</p>
+    <!-- Create Event Form -->
+    <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200 mb-8">
+        <h3 class="text-lg font-medium text-gray-800 mb-4">Create New Event</h3>
+        <form method="POST">
+            {% csrf_token %}
+            <div class="space-y-4">
+                {{ form.as_p }}
+                <div class="pt-2">
+                    <button type="submit" name="create_event" class="inline-flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-md transition-colors duration-200">
+                        <i class="fa-solid fa-plus"></i>
+                        <span>Create Event</span>
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <!-- Events List -->
+    <div class="space-y-6">
+        <h3 class="text-lg font-medium text-gray-800">Manage Existing Events</h3>
+        
+        {% for event in events %}
+        <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+            <form method="POST">
+                {% csrf_token %}
+                <input type="hidden" name="event_id" value="{{ event.id }}">
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                    <div class="space-y-2">
+                        <label class="block text-sm font-medium text-gray-700">Name:</label>
+                        <input type="text" name="title" value="{{ event.name }}" class="block w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500">
+                    </div>
+                    
+                    <div class="space-y-2">
+                        <label class="block text-sm font-medium text-gray-700">Description:</label>
+                        <textarea name="description" class="block w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 min-h-32">{{ event.description }}</textarea>
+                    </div>
+                    
+                    <div class="space-y-2">
+                        <label class="block text-sm font-medium text-gray-700">Start Date:</label>
+                        <input type="date" name="start_date" value="{{ event.start_date|date:'Y-m-d' }}" class="block w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500">
+                    </div>
+                    
+                    <div class="space-y-2">
+                        <label class="block text-sm font-medium text-gray-700">End Date:</label>
+                        <input type="date" name="end_date" value="{{ event.end_date|date:'Y-m-d' }}" class="block w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500">
+                    </div>
+                </div>
+                
+                <div class="flex flex-wrap gap-3 pt-4">
+                    <button name="edit_event" value="true" type="submit" class="inline-flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded-md transition-colors duration-200">
+                        <i class="fa-solid fa-pencil"></i>
+                        <span>Save Changes</span>
+                    </button>
+                    <button name="delete_event" value="true" type="submit" class="inline-flex items-center justify-center gap-2 bg-red-600 hover:bg-red-700 text-white font-medium py-2 px-4 rounded-md transition-colors duration-200">
+                        <i class="fa-solid fa-trash"></i>
+                        <span>Delete Event</span>
+                    </button>
+                    <button name="report" value="true" type="submit" class="inline-flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-md transition-colors duration-200">
+                        <i class="fa-solid fa-file"></i>
+                        <span>Generate Report</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+        {% empty %}
+        <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200 text-center text-gray-500">
+            <p>No events have been created yet.</p>
+        </div>
+        {% endfor %}
+    </div>
 </div>
-
-{% for event in events %}
-<div class="mb-6 p-4 border rounded bg-gray-100">
-    <form method="POST">
-        {% csrf_token %}
-        <input type="hidden" name="event_id" value="{{ event.id }}">
-
-        <label>Name:</label>
-        <input type="text" name="title" value="{{ event.name }}" class="block w-full p-2 mb-2 border rounded">
-
-        <label>Description:</label>
-        <textarea name="description" class="block w-full p-2 mb-2 border rounded">{{ event.description }}</textarea>
-
-        <label>Start Date:</label>
-        <input type="date" name="start_date" value="{{ event.start_date|date:'Y-m-d' }}" class="block w-full p-2 mb-2 border rounded">
-
-        <label>End Date:</label>
-        <input type="date" name="end_date" value="{{ event.end_date|date:'Y-m-d' }}" class="block w-full p-2 mb-2 border rounded">
-
-        <button name="edit_event" value="true" type="submit" class="bg-green-500 hover:bg-green-800 text-white font-bold py-2 px-4 rounded mr-2">
-            <i class="fa-solid fa-pencil"></i> Save Changes
-        </button>
-
-        <button name="delete_event" value="true" type="submit" class="bg-red-500 hover:bg-red-800 text-white font-bold py-2 px-4 mr-2 rounded">
-            <i class="fa-solid fa-trash"></i> Delete Event
-        </button>
-
-        <button name="report" value="true" type="submit" class="bg-blue-500 hover:bg-blue-800 text-white font-bold py-2 px-4 rounded">
-            <i class="fa-solid fa-file"></i> Generate Report
-        </button>
-    </form>
-</div>
-{% endfor %}
-
-{%endblock content%}
+{% endblock content %}

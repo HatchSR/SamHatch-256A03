@@ -41,9 +41,11 @@ def adminEvents(request):
         
         if request.user.is_authenticated:
             if request.session.get('role') == 'Admin':
+                print(Event.objects.all())
                 return render(request, 'adminEvents.html', {'form': EventForm(), 'events': Event.objects.all()})
             else:
                 return redirect('events')
+            
         else:
             print('user is not authenticated')
             return redirect('loginaccount')
@@ -90,7 +92,7 @@ def adminEvents(request):
             if event_id:
                 event = get_object_or_404(Event, id=event_id)
             
-            return redirect('reports', event_id=event_id)
+            return redirect('eventreports', event_id=event_id)
 
             
         return redirect('events')

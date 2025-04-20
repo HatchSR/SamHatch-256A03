@@ -25,12 +25,22 @@ def userreports(request):
     if request.user.is_authenticated:
         if request.session.get('role') == 'Admin':
             person = []
-            for each in Person.objects.all():
+            people={}
+            for each in Person.objects.all():   
                 person.append(each)
             print(person)
-            return HttpResponse(person)
+            for each in person:
+                group_name = each.user_group.name if each.user_group else 'No Group'
+                people.update({each.user.username: group_name})
+                
+            return render(request, 'userReports.html', {'person': people})
         else:
             return redirect('events')
+
+    else:
+        print('user is not authenticated')
+        return redirect('loginaccount')
+        
         
 def registerReports(request):
     events = []
@@ -39,4 +49,7 @@ def registerReports(request):
             if Person.objects.get(user=request.user) in each.registered_users.all():
                 events.append(each)
         print(events)
-        return HttpResponse(events)
+        return render(request, 'registerReports.html', {'events': events})
+    else:
+        print('user is not authenticated')
+        return redirect('loginaccount')
